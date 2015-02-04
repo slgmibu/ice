@@ -169,4 +169,16 @@ public class IceOptions {
     * true/false for using Login.
     */
     public static final String LOGIN_ENABLE = "ice.login";
+
+    /**
+     * Daily Estimates per each account.  Can be appended with a ISO8601 Date stamp to
+     * keep a history of estimates.  The no datetime is the default
+     * ice.account.dailyestimate.accountname=100
+     * ice.account.dailyestimate.accountname.2015-01-26=500
+     * ice.account.dailyestimate.accountname.2015-01-30=550
+     * ice.account.dailyestimate.accountname.2015-02-15=650
+     *
+     */
+    public static final String ACCOUNT_DAILY_ESTIMATES = "ice.account.dailyestimate";
+
 }
