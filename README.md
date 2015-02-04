@@ -245,6 +245,31 @@ Options with * require writing your own code.
 
         ice.use_blended=false
 
+## Authentication
+
+A Framework exists for supplying authentication plugins.  The following properties are required:
+
+	# Turn Logging On/Off
+	ice.login=true
+	
+	# Logging Classes, comma delimited
+	ice.login.classes=com.netflix.ice.login.Passphrase
+	
+	# Logging Names, comma delmited.  These map to a handler above
+        # The name here will expose an http endpoint.
+	# http://.../ice/login/handler/passphrase
+	ice.login.endpoints=passphrase
+	
+	# Passphrase for the Passphrase Implementation
+	ice.login.passphrase=rar
+	
+	# Default Endpoint(where /login/ takes us)
+	ice.login.default_endpoint=passphrase
+	# Login Log file(audit log)
+	ice.login.log=/some/path
+
+Passphrase is simply a reference implementation that guards your ice data with a passphrase(ice.login.passphrase).  To create your own login handler, you can extend the LoginMethod.
+
 ##Support
 
 Please use the [Ice Google Group](https://groups.google.com/d/forum/iceusers) for general questions and discussion.
