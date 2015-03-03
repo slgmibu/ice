@@ -30,6 +30,7 @@ import com.netflix.ice.processor.ProcessorConfig;
 import com.netflix.ice.processor.ReservationService;
 import com.netflix.ice.tag.*;
 import com.netflix.ice.tag.Region;
+import groovy.util.MapEntry;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateMidnight;
 import org.slf4j.Logger;
@@ -79,6 +80,9 @@ public class BasicReservationService extends Poller implements ReservationServic
 
         ec2InstanceReservationPrices = Maps.newHashMap();
         for (ReservationUtilization utilization: ReservationUtilization.values()) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Create ec2InstanceReservationPrices Key" + utilization.name());
+            }
             ec2InstanceReservationPrices.put(utilization, new ConcurrentSkipListMap<Ec2InstanceReservationPrice.Key, Ec2InstanceReservationPrice>());
         }
 
@@ -118,6 +122,18 @@ public class BasicReservationService extends Poller implements ReservationServic
                         DataInputStream in = new DataInputStream(new FileInputStream(file));
                         ec2InstanceReservationPrices.put(utilization, Serializer.deserialize(in));
                         in.close();
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Loaded " + file.getAbsolutePath().toString());
+                            Map<Ec2InstanceReservationPrice.Key, Ec2InstanceReservationPrice> prices = ec2InstanceReservationPrices.get(utilization);
+                            for(Ec2InstanceReservationPrice.Key k : prices.keySet()) {
+                                Ec2InstanceReservationPrice price = prices.get(k);
+                                logger.debug("Ec2InstanceReservationPrice: " +
+                                        k.region.name + ", " +
+                                        k.usageType.name + ", " +
+                                        price.toString() + ", "
+                                );
+                            }
+                        }
                     }
                 }
                 catch (Exception e) {
@@ -322,8 +338,18 @@ public class BasicReservationService extends Poller implements ReservationServic
             ec2InstanceReservationPrices.get(utilization).get(new Ec2InstanceReservationPrice.Key(region, usageType));
 
         double tier = getEc2Tier(time);
-        return ec2Price.hourlyPrice.getPrice(null).getPrice(tier) +
-               ec2Price.upfrontPrice.getPrice(null).getUpfrontAmortized(time, term, tier);
+        if (ec2Price == null) {
+            logger.error("Did not receive a proper Ec2InstanceReservationPrice for " +
+                    time + ", " +
+                    region.name + ", " +
+                    usageType.name + ", " +
+                    utilization.name() );
+        }
+        Price hourlyPriceObject = ec2Price.hourlyPrice.getPrice(null);
+        double hourlyPrice = hourlyPriceObject.getPrice(tier);
+        Price upfrontPriceObject = ec2Price.upfrontPrice.getPrice(null);
+        double upfrontPrice =  upfrontPriceObject.getUpfrontAmortized(time, term, tier);
+        return hourlyPrice + upfrontPrice;
     }
 
     public ReservationInfo getReservation(

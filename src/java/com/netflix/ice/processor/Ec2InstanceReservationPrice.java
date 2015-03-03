@@ -47,6 +47,10 @@ public class Ec2InstanceReservationPrice {
         this.hourlyPrice = hourlyPrice;
     }
 
+    public String toString() {
+        return "HourlyPrice: " + hourlyPrice.prices.toString() + "\nUpfrontPrice: "  + upfrontPrice.prices.toString();
+    }
+
     public static class VersionedPrice {
         private ConcurrentSkipListMap<Long, Price> prices = new ConcurrentSkipListMap<Long, Price>();
 

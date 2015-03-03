@@ -213,6 +213,10 @@ public class BasicLineItemProcessor implements LineItemProcessor {
                 }
                 catch (Exception e) {
                     logger.error("failed to get RI price for " + tagGroup.region + " " + usageTypeForPrice);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(e.toString());
+                        e.printStackTrace();
+                    }
                     resourceCostValue = -1;
                 }
             }
