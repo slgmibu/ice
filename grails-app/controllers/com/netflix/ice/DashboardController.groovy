@@ -420,6 +420,8 @@ class DashboardController {
 
     def detail = {}
 
+    def estimates={}
+
     def reservation = {}
 
     def breakdown = {}
@@ -436,6 +438,10 @@ class DashboardController {
 
         TagType groupBy = query.getString("groupBy").equals("None") ? null : TagType.valueOf(query.getString("groupBy"));
         boolean isCost = query.getBoolean("isCost");
+        boolean includeEstimates = false;
+        if (query.has("includeEstimates")) {
+            includeEstimates = query.getBoolean("includeEstimates");
+        }
         boolean breakdown = query.getBoolean("breakdown");
         boolean showsps = query.getBoolean("showsps");
         boolean factorsps = query.getBoolean("factorsps");
@@ -481,6 +487,11 @@ class DashboardController {
             }
         }
         interval = roundInterval(interval, consolidateType);
+
+        //we will have an estimate for each datapoint
+        Map<Tag, double[]> estimates;
+
+
 
         Map<Tag, double[]> data;
         if (groupBy == TagType.ApplicationGroup) {
@@ -594,12 +605,22 @@ class DashboardController {
                 aggregate,
                 forReservation
             );
+            //groupBy Account can have estimates
+            if (includeEstimates) {
+                DataManager estimateManager = getManagers().getEstimateManager(consolidateType);
+                estimates = estimateManager.getData(interval, new TagLists(accounts, regions, zones, products, operations, usageTypes, resourceGroups), groupBy, aggregate, forReservation);
+            }
         }
-        def stats = getStats(data);
+        def stats = getStats(data, estimates);
         if (aggregate == AggregateType.stats && data.size() > 1)
             data.remove(Tag.aggregated);
 
         def result = [status: 200, start: interval.getStartMillis(), data: data, stats: stats, groupBy: groupBy == null ? "None" : groupBy.name()]
+        if (estimates != null)
+        {
+            result.put("estimates", estimates);
+        }
+
         if (breakdown && data.size() > 0 && data.values().iterator().next().length > 0) {
             result.time = new IntRange(0, data.values().iterator().next().length - 1).collect {
                 if (consolidateType == ConsolidateType.daily)
@@ -703,7 +724,7 @@ class DashboardController {
         }
     }
 
-    private Map<Tag, Map> getStats(Map<Tag, double[]> data) {
+    private Map<Tag, Map> getStats(Map<Tag, double[]> data, Map<Tag, double[]> estimates) {
         def result = [:];
 
         for (Map.Entry<Tag, double[]> entry: data.entrySet()) {
@@ -721,6 +742,15 @@ class DashboardController {
                 total += v;
             }
             result[tag] = [max: max, total: total, average: total / values.length];
+            double totalEstimate = 0;
+            if (estimates) {
+                for (double v: estimates[tag]) {
+                    totalEstimate += v;
+                }
+                result[tag]["averageEstimate"]=totalEstimate/values.length;
+                result[tag]["totalEstimate"]=totalEstimate;
+            }
+
         }
 
         return result;
