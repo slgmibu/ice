@@ -28,6 +28,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -88,23 +89,59 @@ public class BasicLineItemProcessor implements LineItemProcessor {
     }
 
     public Result process(long startMilli, boolean processDelayed, ProcessorConfig config, String[] items, Map<Product, ReadWriteData> usageDataByProduct, Map<Product, ReadWriteData> costDataByProduct, Map<String, Double> ondemandRate) {
-        if (StringUtils.isEmpty(items[accountIdIndex]) ||
-            StringUtils.isEmpty(items[productIndex]) ||
-            StringUtils.isEmpty(items[usageTypeIndex]) ||
-            StringUtils.isEmpty(items[operationIndex]) ||
-            StringUtils.isEmpty(items[usageQuantityIndex]) ||
-            StringUtils.isEmpty(items[costIndex]))
+
+        if (StringUtils.isEmpty(items[costIndex])) {
+            logger.debug("Ignoring Record due to missing Cost - " + Arrays.toString(items));
             return Result.ignore;
+        }
+
+        double costValue = Double.parseDouble(items[costIndex]);
+        boolean credit = false;
+
+        // make sure we don't ignore credits
+        if (costValue < 0) {
+            credit = true;
+        }
+
+        if (credit) {
+            if (! reformCredit(startMilli, items))
+                return Result.ignore;
+        }
+        // fail-fast on records we can't process
+        if (StringUtils.isEmpty(items[accountIdIndex])) {
+            logger.debug("Ignoring Record due to missing Account Id - " + Arrays.toString(items));
+            return Result.ignore;
+        } 
+        if (StringUtils.isEmpty(items[productIndex])) {
+            logger.debug("Ignoring Record due to missing Product - " + Arrays.toString(items));
+            return Result.ignore;
+        }
+        if (StringUtils.isEmpty(items[usageTypeIndex])) {
+            logger.debug("Ignoring Record due to missing Usage Type - " + Arrays.toString(items));
+            return Result.ignore;
+        }
+        if (StringUtils.isEmpty(items[operationIndex])) {
+            logger.debug("Ignoring Record due to missing Operation - " + Arrays.toString(items));
+            return Result.ignore;
+        }
+        if (StringUtils.isEmpty(items[usageQuantityIndex])) {
+            logger.debug("Ignoring Record due to missing Usage Quantity - " + Arrays.toString(items));
+            return Result.ignore;
+        }
 
         Account account = config.accountService.getAccountById(items[accountIdIndex]);
-        if (account == null)
+        if (account == null) {
+            logger.debug("Ignoring Record due to missing Account - " + Arrays.toString(items));
             return Result.ignore;
+        }
 
         double usageValue = Double.parseDouble(items[usageQuantityIndex]);
-        double costValue = Double.parseDouble(items[costIndex]);
 
         long millisStart;
         long millisEnd;
+
+        Result result = Result.hourly;
+
         try {
             millisStart = amazonBillingDateFormat.parseMillis(items[startTimeIndex]);
             millisEnd = amazonBillingDateFormat.parseMillis(items[endTimeIndex]);
@@ -116,7 +153,7 @@ public class BasicLineItemProcessor implements LineItemProcessor {
 
         Product product = config.productService.getProductByAwsName(items[productIndex]);
         boolean reservationUsage = "Y".equals(items[reservedIndex]);
-        ReformedMetaData reformedMetaData = reform(millisStart, config, product, reservationUsage, items[operationIndex], items[usageTypeIndex], items[descriptionIndex], costValue);
+        ReformedMetaData reformedMetaData = reform(millisStart, config, product, reservationUsage, items[operationIndex], items[usageTypeIndex], items[descriptionIndex], costValue, credit);
         product = reformedMetaData.product;
         Operation operation = reformedMetaData.operation;
         UsageType usageType = reformedMetaData.usageType;
@@ -125,7 +162,6 @@ public class BasicLineItemProcessor implements LineItemProcessor {
         int startIndex = (int)((millisStart - startMilli)/ AwsUtils.hourMillis);
         int endIndex = (int)((millisEnd + 1000 - startMilli)/ AwsUtils.hourMillis);
 
-        Result result = Result.hourly;
         if (product == Product.ec2_instance) {
             result = processEc2Instance(processDelayed, reservationUsage, operation, zone);
         }
@@ -145,13 +181,15 @@ public class BasicLineItemProcessor implements LineItemProcessor {
             result = processRds(usageType);
         }
 
-        if (result == Result.ignore || result == Result.delay)
+        if (result == Result.ignore || result == Result.delay) {
+            logger.debug("Record not processed  - " + result + " - " + Arrays.toString(items));
             return result;
+        }
 
         if (usageType.name.startsWith("TimedStorage-ByteHrs"))
             result = Result.daily;
 
-        boolean monthlyCost = StringUtils.isEmpty(items[descriptionIndex]) ? false : items[descriptionIndex].toLowerCase().contains("-month");
+        boolean monthlyCost = StringUtils.isEmpty(items[descriptionIndex]) ? false : ( items[descriptionIndex].toLowerCase().contains("-month") );
 
         ReadWriteData usageData = usageDataByProduct.get(null);
         ReadWriteData costData = costDataByProduct.get(null);
@@ -234,7 +272,6 @@ public class BasicLineItemProcessor implements LineItemProcessor {
             return result;
 
         for (int i : indexes) {
-
             if (config.randomizer != null) {
 
                 if (tagGroup.product != Product.rds && tagGroup.product != Product.s3 && usageData.getData(i).get(tagGroup) != null)
@@ -345,7 +382,38 @@ public class BasicLineItemProcessor implements LineItemProcessor {
             return Result.hourly;
     }
 
-    protected ReformedMetaData reform(long millisStart, ProcessorConfig config, Product product, boolean reservationUsage, String operationStr, String usageTypeStr, String description, double cost) {
+    protected boolean reformCredit(long startMilli, String[] items) {
+
+        String[] split_description = items[descriptionIndex].split(":");
+
+        // If the credit doesn't have a start and end time then we... set to end to end of month
+        if (items[startTimeIndex].isEmpty()) {
+            int numHoursInMonth = new DateTime(startMilli, DateTimeZone.UTC).dayOfMonth().getMaximumValue() * 24;
+            items[startTimeIndex]=new DateTime(startMilli, DateTimeZone.UTC).plusHours(numHoursInMonth-1).toString(amazonBillingDateFormat);
+            items[endTimeIndex]=new DateTime(startMilli, DateTimeZone.UTC).plusHours(numHoursInMonth).toString(amazonBillingDateFormat);
+            logger.debug("Credit did not have a Time - Set to " + items[startTimeIndex] + "-" + items[endTimeIndex]) ;
+        }
+
+        // try to use the description to fetch some info about the credit if we have nothing
+        if (items[operationIndex].isEmpty()) {
+            if (split_description.length > 0)
+                items[operationIndex]=split_description[0];
+            else
+                items[operationIndex]="credit";
+        }
+
+        if (items[usageTypeIndex].isEmpty()) {
+            items[usageTypeIndex]="credit";
+        }
+
+        if (items[usageQuantityIndex].isEmpty())
+            items[usageQuantityIndex]="1";
+
+        return true;
+
+    }
+
+    protected ReformedMetaData reform(long millisStart, ProcessorConfig config, Product product, boolean reservationUsage, String operationStr, String usageTypeStr, String description, double cost, boolean credit) {
 
         Operation operation = null;
         UsageType usageType = null;
@@ -432,6 +500,9 @@ public class BasicLineItemProcessor implements LineItemProcessor {
             usageType = UsageType.getUsageType(usageTypeStr, operation, description);
         }
 
+        if (credit) {
+            product = new Product(product.name + " credit");
+        }
         return new ReformedMetaData(region, product, operation, usageType);
     }
 
