@@ -124,5 +124,6 @@ grails.project.dependency.resolution = {
 
     plugins {
 	build ":tomcat:2.2.1"
+	runtime ":cors:1.1.8"
     }
 }
