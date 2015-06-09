@@ -28,6 +28,7 @@ grails.project.dependency.resolution = {
     }
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {
+        mavenRepo "http://repo.grails.org/grails/plugins/"
         grailsPlugins()
         grailsHome()
         grailsCentral()
@@ -124,6 +125,6 @@ grails.project.dependency.resolution = {
 
     plugins {
 	build ":tomcat:2.2.1"
-	runtime ":cors:1.1.8"
+	runtime ":cors:1.1.9"
     }
 }
