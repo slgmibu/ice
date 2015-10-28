@@ -231,6 +231,8 @@ class BootStrap {
 
             if ("true".equals(prop.getProperty("ice.reader"))) {
                 properties.setProperty(IceOptions.LOCAL_DIR, prop.getProperty("ice.reader.localDir"));
+                if (prop.getProperty(IceOptions.COMPANY_NAME) != null)
+                    properties.setProperty(IceOptions.COMPANY_NAME, prop.getProperty(IceOptions.COMPANY_NAME));
                 if (prop.getProperty(IceOptions.MONTHLY_CACHE_SIZE) != null)
                     properties.setProperty(IceOptions.MONTHLY_CACHE_SIZE, prop.getProperty(IceOptions.MONTHLY_CACHE_SIZE));
                 if (prop.getProperty(IceOptions.CURRENCY_RATE) != null)
