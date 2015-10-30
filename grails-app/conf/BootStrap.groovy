@@ -191,6 +191,8 @@ class BootStrap {
 
                 if (prop.getProperty(IceOptions.COMPANY_NAME) != null)
                     properties.setProperty(IceOptions.COMPANY_NAME, prop.getProperty(IceOptions.COMPANY_NAME));
+                if (prop.getProperty(IceOptions.ICE_PROCESSOR_CLEANUP) != null)
+                    properties.setProperty(IceOptions.ICE_PROCESSOR_CLEANUP, prop.getProperty(IceOptions.ICE_PROCESSOR_CLEANUP));
                 if (prop.getProperty(IceOptions.COST_PER_MONITORMETRIC_PER_HOUR) != null)
                     properties.setProperty(IceOptions.COST_PER_MONITORMETRIC_PER_HOUR, prop.getProperty(IceOptions.COST_PER_MONITORMETRIC_PER_HOUR));
                 if (prop.getProperty(IceOptions.FROM_EMAIL) != null)

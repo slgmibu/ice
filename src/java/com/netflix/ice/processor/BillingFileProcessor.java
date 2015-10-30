@@ -185,6 +185,9 @@ public class BillingFileProcessor extends Poller {
                 hasTags = hasTags || withTags;
                 processingMonitor = false;
                 processBillingZipFile(file, withTags);
+                if (config.cleanupProcessingFiles) {
+                    file.delete();
+                }
                 logger.info("done processing " + fileKey);
             }
 

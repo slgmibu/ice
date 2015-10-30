@@ -81,6 +81,11 @@ public class IceOptions {
     public static final String BILLING_ACCESS_EXTERNALID = "ice.billing_accessExternalId";
 
     /**
+     * Have the processor cleanup files when no longer required
+     */
+    public static final String ICE_PROCESSOR_CLEANUP = "ice.processorCleanup";
+
+    /**
      * User can configure their custom tags.
      */
     public static final String CUSTOM_TAGS = "ice.customTags";
