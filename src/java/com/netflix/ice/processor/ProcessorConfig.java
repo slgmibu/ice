@@ -43,6 +43,7 @@ public class ProcessorConfig extends Config {
     public final double costPerMonitorMetricPerHour;
 
     public final String useCostForResourceGroup;
+    public final boolean cleanupProcessingFiles;
 
     /**
      *
@@ -93,6 +94,8 @@ public class ProcessorConfig extends Config {
         reservationService.init();
         if (resourceService != null)
             resourceService.init();
+
+        cleanupProcessingFiles = Boolean.parseBoolean(properties.getProperty(IceOptions.ICE_PROCESSOR_CLEANUP, "false"));
 
         billingFileProcessor = new BillingFileProcessor(
             properties.getProperty(IceOptions.URL_PREFIX),
