@@ -21,7 +21,7 @@
 <!DOCTYPE html>
 <html ng-app="ice">
 <head>
-  <title><g:layoutTitle default="${ReaderConfig.getInstance().companyName} HERE AWS Billing Console"/></title>
+  <title><g:layoutTitle default="${ReaderConfig.getInstance().companyName} AWS Billing Console"/></title>
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
   <link rel="stylesheet" href="${resource(dir: 'css/ui-lightness', file: 'jquery-ui-1.10.3.custom.min.css')}"/>
@@ -33,7 +33,7 @@
     <div class="header" style="padding-top:15px; height:43px">
       <a href="${resource(dir: '/')}">
         <span class="mainHeader">
-          ${ReaderConfig.getInstance().companyName} AWS Usage Dashboard
+          ${ReaderConfig.getInstance().companyName} AWS Billing Console 
         </span>
       </a>
     </div>
