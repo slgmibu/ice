@@ -5,7 +5,7 @@ a, input     { outline: none; }
 p            { padding: 10px 0; }
 img          { border: none; }
 .titlebar a:link, .titlebar a:visited, .titlebar a:hover { color: #FFF !important; }
-.titlebar                 { background-color: #000; color: #FFF; padding: 0 0 0 5px; height: 58px; clear: both; min-width: 885px; }
+.titlebar                 { background-color: #124191; color: #FFF; padding: 0 0 0 5px; height: 58px; clear: both; min-width: 885px; }
 .prod .titlebar,
 .prod .titlebar .cmc,
 .prod .titlebar .region   { background-color: #E9231B; }
