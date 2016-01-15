@@ -9,7 +9,7 @@ img          { border: none; }
 .prod .titlebar,
 .prod .titlebar .cmc,
 .prod .titlebar .region   { background-color: #E9231B; }
-.titlebar span            { text-shadow: #E9231B 3px 3px 2px; font-size: 24px; font-family: helvetica, verdana, arial, sans-serif; }
+.titlebar span            { font-size: 24px; font-family: helvetica, verdana, arial, sans-serif; }
 .prod .titlebar span      { text-shadow: #000 4px 4px 2px; }
 .titlebar span.mainHeader { padding: 10px 16px 10px 10px; }
 .titlebar img.console     { margin-right: 6px; height: 58px; }
