@@ -72,6 +72,9 @@ public class Zone extends Tag {
     public static final Zone AP_SOUTHEAST_2A = new Zone(Region.AP_SOUTHEAST_2, "ap-southeast-2a");
     public static final Zone AP_SOUTHEAST_2B = new Zone(Region.AP_SOUTHEAST_2, "ap-southeast-2b");
 
+    public static final Zone AP_SOUTH_1A = new Zone(Region.AP_SOUTH_1, "ap-south-1a");
+    public static final Zone AP_SOUTH_1B = new Zone(Region.AP_SOUTH_1, "ap-south-1b");
+
     private static ConcurrentMap<String, Zone> zonesByName = Maps.newConcurrentMap();
 
     static {
@@ -112,6 +115,9 @@ public class Zone extends Tag {
 
         zonesByName.put(AP_SOUTHEAST_2A.name, AP_SOUTHEAST_2A);
         zonesByName.put(AP_SOUTHEAST_2B.name, AP_SOUTHEAST_2B);
+
+        zonesByName.put(AP_SOUTH_1A.name, AP_SOUTH_1A);
+        zonesByName.put(AP_SOUTH_1B.name, AP_SOUTH_1B);
     }
 
     public static void addZone(Zone zone) {

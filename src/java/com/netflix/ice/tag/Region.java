@@ -32,6 +32,7 @@ public class Region extends Tag {
     public static final Region EU_CENTRAL_1 = new Region("eu-central-1", "EUC1");
     public static final Region AP_SOUTHEAST_1 = new Region("ap-southeast-1", "APS1");
     public static final Region AP_SOUTHEAST_2 = new Region("ap-southeast-2", "APS2");
+    public static final Region AP_SOUTH_1 = new Region("ap-south-1", "ASO1");
     public static final Region AP_NORTHEAST_1 = new Region("ap-northeast-1","APN1");
     public static final Region AP_NORTHEAST_2 = new Region("ap-northeast-2","APN2");
     public static final Region SA_EAST_1 = new Region("sa-east-1", "SAE1");
@@ -47,6 +48,7 @@ public class Region extends Tag {
         regionsByShortName.put(EU_CENTRAL_1.shortName, EU_CENTRAL_1);
         regionsByShortName.put(AP_SOUTHEAST_1.shortName, AP_SOUTHEAST_1);
         regionsByShortName.put(AP_SOUTHEAST_2.shortName, AP_SOUTHEAST_2);
+        regionsByShortName.put(AP_SOUTH_1.shortName, AP_SOUTH_1);
         regionsByShortName.put(AP_NORTHEAST_1.shortName, AP_NORTHEAST_1);
         regionsByShortName.put(AP_NORTHEAST_2.shortName, AP_NORTHEAST_2);
         regionsByShortName.put(SA_EAST_1.shortName, SA_EAST_1);
@@ -58,6 +60,7 @@ public class Region extends Tag {
         regionsByName.put(EU_CENTRAL_1.name, EU_CENTRAL_1);
         regionsByName.put(AP_SOUTHEAST_1.name, AP_SOUTHEAST_1);
         regionsByName.put(AP_SOUTHEAST_2.name, AP_SOUTHEAST_2);
+        regionsByName.put(AP_SOUTH_1.name, AP_SOUTH_1);
         regionsByName.put(AP_NORTHEAST_1.name, AP_NORTHEAST_1);
         regionsByName.put(AP_NORTHEAST_2.name, AP_NORTHEAST_2);
         regionsByName.put(SA_EAST_1.name, SA_EAST_1);
