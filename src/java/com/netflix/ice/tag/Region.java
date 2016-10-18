@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentMap;
 public class Region extends Tag {
 
     public static final Region US_EAST_1 = new Region("us-east-1", "USE1");
+    public static final Region US_EAST_2 = new Region("us-east-2", "USE2");
     public static final Region US_WEST_1 = new Region("us-west-1", "USW1");
     public static final Region US_WEST_2 = new Region("us-west-2", "USW2");
     public static final Region EU_WEST_1 = new Region("eu-west-1", "EU");
@@ -42,6 +43,7 @@ public class Region extends Tag {
 
     static {
         regionsByShortName.put(US_EAST_1.shortName, US_EAST_1);
+        regionsByShortName.put(US_EAST_2.shortName, US_EAST_2);
         regionsByShortName.put(US_WEST_1.shortName, US_WEST_1);
         regionsByShortName.put(US_WEST_2.shortName, US_WEST_2);
         regionsByShortName.put(EU_WEST_1.shortName, EU_WEST_1);
@@ -54,6 +56,7 @@ public class Region extends Tag {
         regionsByShortName.put(SA_EAST_1.shortName, SA_EAST_1);
 
         regionsByName.put(US_EAST_1.name, US_EAST_1);
+        regionsByName.put(US_EAST_2.name, US_EAST_2);
         regionsByName.put(US_WEST_1.name, US_WEST_1);
         regionsByName.put(US_WEST_2.name, US_WEST_2);
         regionsByName.put(EU_WEST_1.name, EU_WEST_1);
