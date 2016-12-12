@@ -37,7 +37,7 @@ public class Region extends Tag {
     public static final Region AP_NORTHEAST_1 = new Region("ap-northeast-1","APN1");
     public static final Region AP_NORTHEAST_2 = new Region("ap-northeast-2","APN2");
     public static final Region SA_EAST_1 = new Region("sa-east-1", "SAE1");
-    public static final Region CA_CENTRAL_1 = new Region("ca-central-1", "CAC1");
+    public static final Region CA_CENTRAL_1 = new Region("ca-central-1", "CAN1");
 
     private static ConcurrentMap<String, Region> regionsByName = Maps.newConcurrentMap();
     private static ConcurrentMap<String, Region> regionsByShortName = Maps.newConcurrentMap();
