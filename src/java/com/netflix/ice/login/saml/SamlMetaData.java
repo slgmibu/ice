@@ -69,6 +69,7 @@ public class SamlMetaData extends LoginMethod {
         lr.renderData = client.printClientMetadata();
 ;
         lr.contentType = "application/samlmetadata+xml";
+        logger.info(lr.toString());
         return lr;
     }
 } 
